@@ -65,6 +65,10 @@ module.exports = (env, argv) => {
           {
             from: 'public/manifest.json',
             to: 'manifest.json'
+          },
+          {
+            from: 'src/content/*.css',
+            to: 'content/[name][ext]'
           }
         ]
       }),

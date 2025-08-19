@@ -104,12 +104,15 @@ async function initializeExtension(): Promise<void> {
       notifications: {
         enabled: true,
         emailDetection: true,
-        billingReminders: true
+        billingReminders: true,
+        syncStatus: true
       },
       aiSettings: {
         analysisEnabled: true,
         autoTimeEstimation: true,
-        autoClientDetection: true
+        autoClientDetection: true,
+        confidenceThreshold: 0.7,
+        keywords: []
       }
     });
     
@@ -201,6 +204,7 @@ async function handleEmailAnalysis(emailData: any): Promise<any> {
       emailId: emailData.id,
       subject: emailData.subject,
       sender: emailData.sender,
+      recipients: emailData.recipients || [],
       timestamp: emailData.timestamp,
       aiAnalysis: analysisResult,
       status: 'pending',
