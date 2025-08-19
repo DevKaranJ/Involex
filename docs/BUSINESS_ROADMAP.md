@@ -42,14 +42,14 @@ Become the leading AI-powered billing automation solution for the legal industry
 
 ### Pricing Tiers
 
-#### Tier 1: Solo Lawyer ($29/month)
+#### Tier 1: Solo Lawyer 
 - Single user license
 - Basic AI email analysis
 - 1 practice management integration
 - Email support
 - 500 emails processed/month
 
-#### Tier 2: Small Firm ($79/month for up to 5 users)
+#### Tier 2: Small Firm 
 - Multi-user support
 - Advanced AI features
 - All practice management integrations
@@ -57,7 +57,7 @@ Become the leading AI-powered billing automation solution for the legal industry
 - Unlimited email processing
 - Basic analytics
 
-#### Tier 3: Professional Firm ($199/month for up to 25 users)
+#### Tier 3: Professional Firm 
 - Everything in Small Firm
 - Advanced analytics and reporting
 - Custom billing rules
@@ -65,7 +65,7 @@ Become the leading AI-powered billing automation solution for the legal industry
 - API access
 - Phone support
 
-#### Tier 4: Enterprise ($499/month for unlimited users)
+#### Tier 4: Enterprise 
 - Everything in Professional
 - White-label options
 - Custom integrations
