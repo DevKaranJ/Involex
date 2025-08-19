@@ -1,0 +1,239 @@
+/* Involex Gmail Integration Styles */
+
+.involex-billing-widget {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.involex-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.involex-logo {
+  font-weight: 600;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.involex-status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.involex-status.pending {
+  background: rgba(251, 191, 36, 0.2);
+  color: #fbbf24;
+}
+
+.involex-status.ready {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.involex-widget-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.involex-time-estimate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.involex-time-estimate .label {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.involex-time-estimate .value {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.involex-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.involex-btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+
+.involex-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.involex-btn:active {
+  transform: translateY(0);
+}
+
+.involex-btn.analyze {
+  flex: 1;
+}
+
+.involex-btn.add-billing {
+  flex: 1;
+}
+
+/* Compose Widget */
+.involex-compose-widget {
+  background: #f8f9fa;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  margin: 8px 0;
+  padding: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.involex-compose-header {
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.involex-compose-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-input {
+  width: 60px;
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.involex-compose-controls span {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.involex-compose-controls .involex-btn {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+  padding: 4px 12px;
+}
+
+.involex-compose-controls .involex-btn:hover {
+  background: #5a67d8;
+  border-color: #5a67d8;
+}
+
+/* Gmail-specific adjustments */
+.involex-billing-widget {
+  max-width: 100%;
+  z-index: 1000;
+  position: relative;
+}
+
+/* Make sure widget doesn't interfere with Gmail UI */
+.nH .involex-billing-widget {
+  margin: 8px 0;
+}
+
+.ii.gt .involex-billing-widget {
+  margin-top: 12px;
+}
+
+/* Hide widget when printing */
+@media print {
+  .involex-billing-widget,
+  .involex-compose-widget {
+    display: none !important;
+  }
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .involex-actions {
+    flex-direction: column;
+  }
+  
+  .involex-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .involex-time-estimate {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Animation for widget appearance */
+@keyframes involex-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.involex-billing-widget,
+.involex-compose-widget {
+  animation: involex-fade-in 0.3s ease-out;
+}
+
+/* Loading state */
+.involex-btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.involex-btn.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: involex-spin 0.8s linear infinite;
+}
+
+@keyframes involex-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
