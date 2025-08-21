@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User preferences
+  settings  UserSettings?
+  
+  // Billing entries
+  billingEntries BillingEntry[]
+  
+  // Email analyses
+  emailAnalyses EmailAnalysis[]
+
+  @@map("users")
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // AI Analysis Settings
+  aiAnalysisEnabled    Boolean @default(true)
+  autoAnalyzeEmails    Boolean @default(true)
+  aiModel              String  @default("gpt-4")
+  confidenceThreshold  Float   @default(0.7)
+
+  // Billing Settings
+  defaultHourlyRate    Float?
+  defaultClient        String?
+  defaultMatter        String?
+  
+  // Practice Management Integration
+  practiceManagementProvider String?
+  practiceManagementApiKey   String?
+  practiceManagementConfig   Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_settings")
+}
+
+model EmailAnalysis {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Email metadata
+  emailId       String
+  platform      String // "gmail" | "outlook"
+  subject       String
+  sender        String
+  recipients    String[]
+  timestamp     DateTime
+  threadId      String?
+
+  // Email content
+  content       String
+  direction     String // "incoming" | "outgoing"
+
+  // AI Analysis results
+  isLegalEmail       Boolean
+  estimatedTime      Float?
+  workType           String?
+  suggestedClient    String?
+  suggestedMatter    String?
+  confidence         Float?
+  analysisDetails    Json?
+
+  // Processing status
+  status        String @default("pending") // "pending" | "analyzing" | "complete" | "error"
+  errorMessage  String?
+
+  // Billing integration
+  billingEntry  BillingEntry?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("email_analyses")
+  @@index([userId, platform])
+  @@index([emailId])
+}
+
+model BillingEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Email reference
+  emailAnalysisId String? @unique
+  emailAnalysis   EmailAnalysis? @relation(fields: [emailAnalysisId], references: [id])
+
+  // Billing details
+  description     String
+  timeSpent       Float // in hours
+  hourlyRate      Float?
+  totalAmount     Float?
+  
+  // Client/Matter information
+  client          String
+  matter          String?
+  workType        String?
+
+  // Date and time
+  workDate        DateTime
+  
+  // Status
+  status          String @default("draft") // "draft" | "submitted" | "billed" | "paid"
+  
+  // Practice management integration
+  externalId      String? // ID in practice management system
+  syncedAt        DateTime?
+  syncStatus      String @default("pending") // "pending" | "synced" | "error"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("billing_entries")
+  @@index([userId, status])
+  @@index([workDate])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  userId    String
+  
+  name      String
+  key       String   @unique
+  isActive  Boolean  @default(true)
+  lastUsed  DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("api_keys")
+}

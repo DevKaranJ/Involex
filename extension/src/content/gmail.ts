@@ -19,12 +19,12 @@ interface GmailEmail {
 }
 
 class EnhancedGmailIntegration {
-  private isInitialized = false;
-  private emailCache = new Map<string, GmailEmail>();
-  private observer: MutationObserver | null = null;
-  private currentEmailId: string | null = null;
-  private composeWidgets = new Set<HTMLElement>();
-  private readWidgets = new Set<HTMLElement>();
+  private isInitialized = false; // Track initialization status
+  private emailCache = new Map<string, GmailEmail>(); // Track email data
+  private observer: MutationObserver | null = null; // Track DOM mutations
+  private currentEmailId: string | null = null; // Track currently opened email ID
+  private composeWidgets = new Set<HTMLElement>(); // Track compose email widgets
+  private readWidgets = new Set<HTMLElement>(); // Track read email widgets
   private processedEmails = new Set<string>(); // Track processed emails
   private processedComposeWindows = new Set<HTMLElement>(); // Track processed compose windows
   private processedElements = new Set<Element>(); // Track processed DOM elements
