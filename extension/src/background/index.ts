@@ -82,6 +82,42 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true;
     
+    case 'UPDATE_USER_SETTINGS':
+      updateUserSettings(message.data)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'CONNECT_PRACTICE_MANAGEMENT':
+      connectPracticeManagement(message.data.platform)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'DISCONNECT_PRACTICE_MANAGEMENT':
+      disconnectPracticeManagement()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'EXPORT_DATA':
+      exportAllData()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'GET_STORAGE_USAGE':
+      getStorageUsage()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'CLEAR_ALL_DATA':
+      clearAllData()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
     default:
       console.warn('❌ Unknown message type:', message.type);
       sendResponse({ success: false, error: 'Unknown message type' });
@@ -369,6 +405,117 @@ async function getUserSettings(): Promise<any> {
     return await storageManager.getUserSettings();
   } catch (error) {
     console.error('❌ Error getting user settings:', error);
+    throw error;
+  }
+}
+
+// Update user settings
+async function updateUserSettings(updates: any): Promise<any> {
+  try {
+    console.log('📝 Updating user settings');
+    
+    const updatedSettings = await storageManager.updateUserSettings(updates);
+    
+    // Update API client if auth token changed
+    if (updates.apiToken) {
+      apiClient.setAuthToken(updates.apiToken);
+    }
+    
+    return updatedSettings;
+  } catch (error) {
+    console.error('❌ Error updating user settings:', error);
+    throw error;
+  }
+}
+
+// Connect practice management
+async function connectPracticeManagement(platform: string): Promise<any> {
+  try {
+    console.log('🔗 Connecting to practice management:', platform);
+    
+    if (!apiClient.isAuthenticated()) {
+      throw new Error('Not authenticated with Involex API');
+    }
+    
+    const response = await apiClient.connectPracticeManagement(platform, {});
+    
+    if (response.success) {
+      await storageManager.updateUserSettings({
+        practiceManagement: {
+          platform: platform as any,
+          credentials: response.data.credentials,
+          lastSync: new Date().toISOString()
+        }
+      });
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('❌ Error connecting practice management:', error);
+    throw error;
+  }
+}
+
+// Disconnect practice management
+async function disconnectPracticeManagement(): Promise<any> {
+  try {
+    console.log('🔗 Disconnecting practice management');
+    
+    const settings = await storageManager.getUserSettings();
+    
+    if (settings.practiceManagement && apiClient.isAuthenticated()) {
+      await apiClient.disconnectPracticeManagement(settings.practiceManagement.platform);
+    }
+    
+    await storageManager.updateUserSettings({
+      practiceManagement: undefined
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error disconnecting practice management:', error);
+    throw error;
+  }
+}
+
+// Export all data
+async function exportAllData(): Promise<any> {
+  try {
+    console.log('📦 Exporting all data');
+    
+    const exportData = await storageManager.exportData();
+    
+    return exportData;
+  } catch (error) {
+    console.error('❌ Error exporting data:', error);
+    throw error;
+  }
+}
+
+// Get storage usage
+async function getStorageUsage(): Promise<any> {
+  try {
+    const usage = await storageManager.getStorageUsage();
+    return usage;
+  } catch (error) {
+    console.error('❌ Error getting storage usage:', error);
+    throw error;
+  }
+}
+
+// Clear all data
+async function clearAllData(): Promise<any> {
+  try {
+    console.log('🗑️ Clearing all data');
+    
+    await storageManager.clearAllData();
+    
+    // Reset API client
+    apiClient.setAuthToken('');
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error clearing data:', error);
     throw error;
   }
 }

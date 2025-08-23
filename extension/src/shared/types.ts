@@ -90,6 +90,11 @@ export interface UserSettings {
   // Onboarding
   isFirstTime: boolean;
   onboardingCompleted: boolean;
+  
+  // Advanced Settings
+  debug?: boolean;
+  processingInterval?: number;
+  apiTimeout?: number;
 }
 
 export interface EmailData {
