@@ -5,13 +5,64 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
-- 
+- Development preparation for Phase 4 (Practice Management Integration)
 
 ### Changed
-- 
+- Development plan updated to reflect completed Phase 3 (AI Backend Development)
 
 ### Fixed
-- 
+- Minor documentation and changelog organization improvements
+
+---
+
+## [0.3.0] - 2025-08-21
+
+### Added
+- **Phase 3 Complete**: AI-powered backend infrastructure with OpenAI integration
+- Node.js/Express backend API with comprehensive security middleware and authentication
+- PostgreSQL database schema with Prisma ORM for user and billing data management
+- OpenAI GPT-4 integration for intelligent email analysis and time estimation
+- Advanced email classification system with legal work type identification
+- Fallback rule-based analysis ensuring functionality without AI dependency
+- Batch email processing with rate limiting and comprehensive error handling
+- JWT authentication system with refresh tokens and secure password hashing
+- Winston logging with structured output and AI service health monitoring
+- RESTful API endpoints for authentication, analysis, and billing management
+
+### Changed
+- Email analysis endpoints now use real AI processing instead of mock responses
+- Development plan updated to reflect completed Phase 3 (AI Backend Development)
+- Enhanced error handling for OpenAI quota limits and connection issues
+
+### Fixed
+- Rate limiter configuration compatibility issues with rate-limiter-flexible package
+- Prisma schema relation conflicts and TypeScript compilation errors
+- OpenAI service configuration with automatic fallback system
+
+---
+
+## [0.2.0] - 2025-08-19
+
+### Added
+- **Phase 2 Complete**: Gmail and Outlook Web App integration with complete feature parity
+- Enhanced content scripts for both platforms with 66 private methods each
+- Advanced DOM observers for real-time email detection and monitoring
+- Legal email classification with keyword analysis and domain pattern matching
+- Widget injection system with deduplication and cleanup management
+- Auto-analysis functionality for legal emails with background processing
+- Professional UI with Involex branding and billing time tracking
+- Export functionality, context menus, and keyboard shortcuts (Alt+A, Alt+B, Alt+I)
+- Navigation handlers and email event listeners for send/reply/forward detection
+
+### Changed
+- Synchronized Gmail and Outlook integrations to have identical capabilities
+- Both email platforms now support the same comprehensive feature list
+- Updated development plan to reflect completed Phase 2 (Core Email Integration)
+
+### Fixed
+- Widget duplication issues and memory leaks from orphaned elements
+- Cross-platform DOM selector compatibility and event listener setup
+- Missing helper methods and incomplete widget functionality in Outlook
 
 ---
 
