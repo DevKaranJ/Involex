@@ -1,10 +1,10 @@
 import request from 'supertest';
 import express from 'express';
-import practiceManagementRoutes from '../../src/routes/practiceManagement';
-import { practiceManagementService } from '../../src/services/practiceManagementService';
+import practiceManagementRoutes from '../../routes/practiceManagement';
+import { practiceManagementService } from '../../services/practiceManagementService';
 
 // Mock the practice management service
-jest.mock('../../src/services/practiceManagementService', () => ({
+jest.mock('../../services/practiceManagementService', () => ({
   practiceManagementService: {
     getAvailablePlatforms: jest.fn(),
     getConfiguredPlatforms: jest.fn(),
@@ -142,8 +142,9 @@ describe('Practice Management Routes', () => {
 
   describe('GET /api/practice-management/health', () => {
     it('should return platform health status', async () => {
+      const now = new Date('2025-08-23T10:46:59.283Z');
       const health = {
-        cleo: { connected: true, lastSync: new Date() },
+        cleo: { connected: true, lastSync: now },
         'practice-panther': { connected: false, error: 'API key invalid' }
       };
       mockService.getPlatformHealth.mockResolvedValue(health);
@@ -154,7 +155,10 @@ describe('Practice Management Routes', () => {
 
       expect(response.body).toEqual({
         success: true,
-        data: health
+        data: {
+          cleo: { connected: true, lastSync: now.toISOString() },
+          'practice-panther': { connected: false, error: 'API key invalid' }
+        }
       });
     });
   });
