@@ -8,19 +8,30 @@ export interface AppError extends Error {
 }
 
 export const errorHandler = (
-  err: AppError,
+  err: AppError | string | null,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
+  // Convert string or null errors to proper Error objects
+  let error: AppError;
+  
+  if (typeof err === 'string') {
+    error = new Error(err) as AppError;
+  } else if (!err) {
+    error = new Error('Unknown error occurred') as AppError;
+  } else {
+    error = err;
+  }
+
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || 'error';
 
   // Log error
   logger.error('Error occurred:', {
-    message: err.message,
-    stack: err.stack,
-    statusCode: err.statusCode,
+    message: error.message,
+    stack: error.stack,
+    statusCode: error.statusCode,
     url: req.originalUrl,
     method: req.method,
     ip: req.ip,
@@ -29,18 +40,18 @@ export const errorHandler = (
 
   // Send error response
   if (process.env.NODE_ENV === 'development') {
-    res.status(err.statusCode).json({
-      status: err.status,
-      error: err,
-      message: err.message,
-      stack: err.stack
+    res.status(error.statusCode).json({
+      status: error.status,
+      error: error,
+      message: error.message,
+      stack: error.stack
     });
   } else {
     // Production error response
-    if (err.isOperational) {
-      res.status(err.statusCode).json({
-        status: err.status,
-        message: err.message
+    if (error.isOperational) {
+      res.status(error.statusCode).json({
+        status: error.status,
+        message: error.message
       });
     } else {
       // Programming or unknown error
