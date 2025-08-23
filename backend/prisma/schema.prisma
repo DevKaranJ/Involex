@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -46,7 +46,7 @@ model UserSettings {
   // Practice Management Integration
   practiceManagementProvider String?
   practiceManagementApiKey   String?
-  practiceManagementConfig   Json?
+  practiceManagementConfig   String? // JSON as text for SQLite
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -64,7 +64,7 @@ model EmailAnalysis {
   platform      String // "gmail" | "outlook"
   subject       String
   sender        String
-  recipients    String[]
+  recipients    String // Comma-separated string for SQLite
   timestamp     DateTime
   threadId      String?
 
@@ -79,7 +79,7 @@ model EmailAnalysis {
   suggestedClient    String?
   suggestedMatter    String?
   confidence         Float?
-  analysisDetails    Json?
+  analysisDetails    String? // JSON as text for SQLite
 
   // Processing status
   status        String @default("pending") // "pending" | "analyzing" | "complete" | "error"
@@ -124,8 +124,15 @@ model BillingEntry {
   
   // Practice management integration
   externalId      String? // ID in practice management system
+  platform        String? // "cleo" | "practice-panther" | "mycase"
   syncedAt        DateTime?
-  syncStatus      String @default("pending") // "pending" | "synced" | "error"
+  syncStatus      String @default("pending") // "pending" | "syncing" | "synced" | "error" | "conflict"
+  syncError       String? // Error message if sync failed
+  lastSyncAttempt DateTime? // Track when last sync was attempted
+  syncRetryCount  Int @default(0) // Track retry attempts
+
+  // Sync history
+  syncHistory     SyncHistory[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -133,6 +140,67 @@ model BillingEntry {
   @@map("billing_entries")
   @@index([userId, status])
   @@index([workDate])
+  @@index([syncStatus])
+  @@index([platform, externalId])
+}
+
+model SyncHistory {
+  id              String   @id @default(cuid())
+  billingEntryId  String
+  billingEntry    BillingEntry @relation(fields: [billingEntryId], references: [id], onDelete: Cascade)
+
+  // Sync details
+  platform        String // "cleo" | "practice-panther" | "mycase"
+  action          String // "create" | "update" | "delete"
+  status          String // "success" | "error" | "conflict"
+  
+  // Data snapshot
+  dataSnapshot    String? // JSON as text for SQLite
+  externalId      String? // ID returned by practice management system
+  
+  // Error/conflict information
+  errorMessage    String?
+  conflictReason  String?
+  
+  // Timing
+  syncStartedAt   DateTime @default(now())
+  syncCompletedAt DateTime?
+  duration        Int? // Duration in milliseconds
+
+  @@map("sync_history")
+  @@index([billingEntryId])
+  @@index([platform, status])
+}
+
+model SyncQueue {
+  id              String   @id @default(cuid())
+  billingEntryId  String
+  
+  // Sync configuration
+  platform        String // "cleo" | "practice-panther" | "mycase"
+  action          String // "create" | "update" | "delete"
+  priority        Int @default(5) // 1-10, higher number = higher priority
+  
+  // Retry configuration
+  maxRetries      Int @default(3)
+  currentRetries  Int @default(0)
+  retryDelay      Int @default(5000) // Delay in milliseconds
+  
+  // Status
+  status          String @default("pending") // "pending" | "processing" | "completed" | "failed"
+  errorMessage    String?
+  
+  // Scheduling
+  scheduledFor    DateTime @default(now())
+  lockedUntil     DateTime? // For preventing concurrent processing
+  processedBy     String? // Worker/process ID
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("sync_queue")
+  @@index([status, scheduledFor])
+  @@index([platform])
 }
 
 model ApiKey {

@@ -11,6 +11,8 @@ import { logger } from './utils/logger';
 import authRoutes from './routes/auth';
 import analysisRoutes from './routes/analysis';
 import billingRoutes from './routes/billing';
+import practiceManagementRoutes from './routes/practiceManagement';
+import syncRoutes from './routes/sync';
 
 // Load environment variables
 dotenv.config();
@@ -54,6 +56,8 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/practice-management', practiceManagementRoutes);
+app.use('/api/sync', syncRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
