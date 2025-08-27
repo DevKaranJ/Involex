@@ -1,23 +1,34 @@
-/* Involex Gmail Integration Styles */
+/* Involex Gmail Extension Widget Styles */
 
-.involex-billing-widget {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* Base Widget Styles */
+.involex-compose-widget,
+.involex-read-widget {
+  font-family: "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #ffffff;
+  border: 1px solid #e8eaed;
   border-radius: 8px;
-  margin: 12px 0;
-  padding: 12px;
-  color: white;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 8px auto;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #3c4043;
+  position: relative;
+  z-index: 1000;
+  max-width: 450px;
+  width: 100%;
+  overflow: hidden;
 }
 
+/* Widget Headers */
+.involex-compose-header,
 .involex-widget-header {
+  background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%);
+  color: white;
+  padding: 12px 16px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  justify-content: space-between;
+  border-radius: 8px 8px 0 0;
 }
 
 .involex-logo {
@@ -25,178 +36,403 @@
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
-.involex-status {
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 11px;
+.involex-compose-title {
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.involex-status.pending {
-  background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
-}
-
-.involex-status.ready {
-  background: rgba(34, 197, 94, 0.2);
-  color: #22c55e;
-}
-
-.involex-widget-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.involex-time-estimate {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.involex-time-estimate .label {
-  font-size: 12px;
+  font-size: 13px;
   opacity: 0.9;
 }
 
-.involex-time-estimate .value {
-  font-weight: 600;
-  color: #ffffff;
+.involex-status {
+  font-weight: 500;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
-.involex-actions {
+.involex-status.incoming {
+  background: rgba(52, 168, 83, 0.2);
+}
+
+.involex-status.outgoing {
+  background: rgba(251, 188, 4, 0.2);
+}
+
+.involex-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.involex-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Widget Content */
+.involex-compose-content,
+.involex-widget-content {
+  padding: 16px;
+}
+
+/* Compose Widget Specific Styles */
+.involex-time-input-group,
+.involex-client-input-group {
+  margin-bottom: 16px;
+}
+
+.involex-time-input-group label,
+.involex-client-input-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #5f6368;
+  font-size: 12px;
+}
+
+.time-input,
+.client-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: #ffffff;
+}
+
+.time-input:focus,
+.client-input:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.1);
+}
+
+.involex-time-input-group {
   display: flex;
+  align-items: end;
   gap: 8px;
 }
 
-.involex-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+.involex-time-input-group label {
+  flex: 1;
+}
+
+.time-input {
+  width: 80px;
+  flex: none;
+}
+
+.time-unit {
+  color: #5f6368;
+  font-size: 12px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* Read Widget Specific Styles */
+.involex-email-info {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.email-subject {
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #202124;
+  font-size: 14px;
+}
+
+.email-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #5f6368;
+}
+
+.sender {
+  font-weight: 500;
+}
+
+.timestamp {
+  opacity: 0.8;
+}
+
+/* Analysis Section */
+.involex-analysis-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
   border-radius: 6px;
-  color: white;
+  border: 1px solid #f1f3f4;
+}
+
+.analysis-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.status-indicator {
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.status-indicator.analyzing {
+  color: #1a73e8;
+}
+
+.analysis-progress {
+  flex: 1;
+  height: 4px;
+  background: #e8eaed;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #1a73e8;
+  width: 0%;
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  50% {
+    width: 70%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.analysis-results {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.analysis-results > div {
+  text-align: center;
+}
+
+.analysis-results .label {
+  display: block;
+  font-size: 11px;
+  color: #5f6368;
+  margin-bottom: 2px;
+}
+
+.analysis-results .value {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #202124;
+}
+
+/* Action Buttons */
+.involex-compose-actions,
+.involex-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.involex-btn {
+  background: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
   padding: 8px 12px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #3c4043;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .involex-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-1px);
+  background: #f8f9fa;
+  border-color: #c4c7c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .involex-btn:active {
-  transform: translateY(0);
+  background: #f1f3f4;
+  transform: translateY(1px);
 }
 
-.involex-btn.analyze {
-  flex: 1;
-}
-
-.involex-btn.add-billing {
-  flex: 1;
-}
-
-/* Compose Widget */
-.involex-compose-widget {
-  background: #f8f9fa;
-  border: 1px solid #e1e5e9;
-  border-radius: 8px;
-  margin: 8px 0;
-  padding: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.involex-compose-header {
-  font-size: 13px;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.involex-compose-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.time-input {
-  width: 60px;
-  padding: 4px 8px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.involex-compose-controls span {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.involex-compose-controls .involex-btn {
-  background: #667eea;
-  border-color: #667eea;
+.involex-btn.track-time {
+  background: #34a853;
   color: white;
-  padding: 4px 12px;
+  border-color: #34a853;
 }
 
-.involex-compose-controls .involex-btn:hover {
-  background: #5a67d8;
-  border-color: #5a67d8;
+.involex-btn.track-time:hover {
+  background: #2d8f47;
+  border-color: #2d8f47;
 }
 
-/* Gmail-specific adjustments */
-.involex-billing-widget {
-  max-width: 100%;
-  z-index: 1000;
-  position: relative;
+.involex-btn.auto-analyze {
+  background: #fbbc04;
+  color: #202124;
+  border-color: #fbbc04;
 }
 
-/* Make sure widget doesn't interfere with Gmail UI */
-.nH .involex-billing-widget {
-  margin: 8px 0;
+.involex-btn.auto-analyze:hover {
+  background: #f9ab00;
+  border-color: #f9ab00;
 }
 
-.ii.gt .involex-billing-widget {
-  margin-top: 12px;
+.involex-btn.analyze-email {
+  background: #1a73e8;
+  color: white;
+  border-color: #1a73e8;
 }
 
-/* Hide widget when printing */
-@media print {
-  .involex-billing-widget,
-  .involex-compose-widget {
-    display: none !important;
-  }
+.involex-btn.analyze-email:hover {
+  background: #1557b0;
+  border-color: #1557b0;
 }
 
-/* Responsive design for smaller screens */
+.involex-btn.quick-bill {
+  background: #ea4335;
+  color: white;
+  border-color: #ea4335;
+}
+
+.involex-btn.quick-bill:hover {
+  background: #d33b2c;
+  border-color: #d33b2c;
+}
+
+.involex-btn.minimize {
+  background: #f1f3f4;
+  border-color: #dadce0;
+  padding: 6px 8px;
+  min-width: auto;
+}
+
+.involex-btn.minimize:hover {
+  background: #e8eaed;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
+  .involex-compose-widget,
+  .involex-read-widget {
+    margin: 4px;
+    border-radius: 6px;
+    max-width: 100%;
+  }
+
+  .involex-compose-content,
+  .involex-widget-content {
+    padding: 12px;
+  }
+
+  .involex-compose-actions,
   .involex-actions {
-    flex-direction: column;
+    gap: 6px;
   }
-  
+
   .involex-btn {
-    width: 100%;
-    text-align: center;
+    padding: 6px 10px;
+    font-size: 11px;
   }
-  
-  .involex-time-estimate {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+
+  .analysis-results {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .analysis-results > div {
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .involex-compose-widget,
+  .involex-read-widget {
+    background: #2d2e30;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+
+  .time-input,
+  .client-input {
+    background: #3c4043;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+
+  .time-input:focus,
+  .client-input:focus {
+    border-color: #8ab4f8;
+    box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.1);
+  }
+
+  .involex-analysis-section {
+    background: #3c4043;
+    border-color: #5f6368;
+  }
+
+  .involex-btn {
+    background: #3c4043;
+    border-color: #5f6368;
+    color: #e8eaed;
+  }
+
+  .involex-btn:hover {
+    background: #48494a;
+    border-color: #70757a;
+  }
+
+  .email-subject {
+    color: #e8eaed;
+  }
+
+  .analysis-results .value {
+    color: #e8eaed;
   }
 }
 
 /* Animation for widget appearance */
-@keyframes involex-fade-in {
+.involex-compose-widget,
+.involex-read-widget {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -207,33 +443,40 @@
   }
 }
 
-.involex-billing-widget,
-.involex-compose-widget {
-  animation: involex-fade-in 0.3s ease-out;
+/* Minimized state */
+.involex-compose-widget.minimized .involex-compose-content,
+.involex-read-widget.minimized .involex-widget-content {
+  display: none;
 }
 
-/* Loading state */
+.involex-compose-widget.minimized,
+.involex-read-widget.minimized {
+  cursor: pointer;
+}
+
+/* Loading states */
 .involex-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
   position: relative;
-  color: transparent;
 }
 
 .involex-btn.loading::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
   width: 12px;
   height: 12px;
-  margin: -6px 0 0 -6px;
   border: 2px solid transparent;
-  border-top-color: currentColor;
+  border-top: 2px solid currentColor;
   border-radius: 50%;
-  animation: involex-spin 0.8s linear infinite;
+  animation: spin 1s linear infinite;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-@keyframes involex-spin {
+@keyframes spin {
   to {
-    transform: rotate(360deg);
+    transform: translateY(-50%) rotate(360deg);
   }
 }

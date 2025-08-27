@@ -1,9 +1,9 @@
 // Service Worker for Involex Chrome Extension
 // Handles background processing, API communication, and notifications
 
-import { EmailProcessor } from '@/shared/emailProcessor';
-import { StorageManager } from '@/shared/storage';
-import { ApiClient } from '@/shared/apiClient';
+import { EmailProcessor } from '../shared/emailProcessor';
+import { StorageManager } from '../shared/storage';
+import { ApiClient } from '../shared/apiClient';
 
 console.log('🚀 Involex Background Service Worker Starting...');
 
@@ -58,9 +58,63 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true;
     
+    case 'REJECT_BILLING_ENTRY':
+      rejectBillingEntry(message.data)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'UPDATE_BILLING_ENTRY':
+      updateBillingEntry(message.data.entryId, message.data.updates)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'SYNC_ALL_ENTRIES':
+      syncAllApprovedEntries()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
     case 'GET_USER_SETTINGS':
       getUserSettings()
         .then(settings => sendResponse({ success: true, data: settings }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'UPDATE_USER_SETTINGS':
+      updateUserSettings(message.data)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'CONNECT_PRACTICE_MANAGEMENT':
+      connectPracticeManagement(message.data.platform)
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'DISCONNECT_PRACTICE_MANAGEMENT':
+      disconnectPracticeManagement()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'EXPORT_DATA':
+      exportAllData()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'GET_STORAGE_USAGE':
+      getStorageUsage()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'CLEAR_ALL_DATA':
+      clearAllData()
+        .then(result => sendResponse({ success: true, data: result }))
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true;
     
@@ -219,11 +273,12 @@ async function handleEmailAnalysis(emailData: any): Promise<any> {
   }
 }
 
-// Get pending billing entries
+// Get billing entries
 async function getBillingEntries(): Promise<any[]> {
   try {
     const entries = await storageManager.getBillingEntries();
-    return entries.filter(entry => entry.status === 'pending');
+    // Return all entries sorted by creation date (newest first)
+    return entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   } catch (error) {
     console.error('❌ Error getting billing entries:', error);
     throw error;
@@ -264,12 +319,203 @@ async function approveBillingEntry(entryData: any): Promise<any> {
   }
 }
 
+// Reject billing entry
+async function rejectBillingEntry(entryData: any): Promise<any> {
+  try {
+    console.log('❌ Rejecting billing entry:', entryData.id);
+    
+    // Update local storage
+    await storageManager.updateBillingEntry(entryData.id, {
+      ...entryData,
+      status: 'rejected',
+      rejectedAt: new Date().toISOString()
+    });
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Error rejecting billing entry:', error);
+    throw error;
+  }
+}
+
+// Update billing entry
+async function updateBillingEntry(entryId: string, updates: any): Promise<any> {
+  try {
+    console.log('📝 Updating billing entry:', entryId, updates);
+    
+    // Update local storage
+    await storageManager.updateBillingEntry(entryId, updates);
+    
+    return { success: true };
+    
+  } catch (error) {
+    console.error('❌ Error updating billing entry:', error);
+    throw error;
+  }
+}
+
+// Sync all approved entries
+async function syncAllApprovedEntries(): Promise<any> {
+  try {
+    console.log('🔄 Syncing all approved entries');
+    
+    if (!apiClient.isAuthenticated()) {
+      throw new Error('Not authenticated with practice management system');
+    }
+    
+    const entries = await storageManager.getBillingEntries();
+    const approvedEntries = entries.filter(entry => 
+      entry.status === 'approved' && !entry.syncedAt
+    );
+    
+    let syncedCount = 0;
+    let errorCount = 0;
+    
+    for (const entry of approvedEntries) {
+      try {
+        await apiClient.syncBillingEntry(entry);
+        await storageManager.updateBillingEntry(entry.id, {
+          status: 'synced',
+          syncedAt: new Date().toISOString()
+        });
+        syncedCount++;
+      } catch (error) {
+        console.warn(`⚠️ Failed to sync entry ${entry.id}:`, error);
+        errorCount++;
+      }
+    }
+    
+    return { 
+      success: true, 
+      syncedCount, 
+      errorCount,
+      totalProcessed: approvedEntries.length
+    };
+    
+  } catch (error) {
+    console.error('❌ Error syncing approved entries:', error);
+    throw error;
+  }
+}
+
 // Get user settings
 async function getUserSettings(): Promise<any> {
   try {
     return await storageManager.getUserSettings();
   } catch (error) {
     console.error('❌ Error getting user settings:', error);
+    throw error;
+  }
+}
+
+// Update user settings
+async function updateUserSettings(updates: any): Promise<any> {
+  try {
+    console.log('📝 Updating user settings');
+    
+    const updatedSettings = await storageManager.updateUserSettings(updates);
+    
+    // Update API client if auth token changed
+    if (updates.apiToken) {
+      apiClient.setAuthToken(updates.apiToken);
+    }
+    
+    return updatedSettings;
+  } catch (error) {
+    console.error('❌ Error updating user settings:', error);
+    throw error;
+  }
+}
+
+// Connect practice management
+async function connectPracticeManagement(platform: string): Promise<any> {
+  try {
+    console.log('🔗 Connecting to practice management:', platform);
+    
+    if (!apiClient.isAuthenticated()) {
+      throw new Error('Not authenticated with Involex API');
+    }
+    
+    const response = await apiClient.connectPracticeManagement(platform, {});
+    
+    if (response.success) {
+      await storageManager.updateUserSettings({
+        practiceManagement: {
+          platform: platform as any,
+          credentials: response.data.credentials,
+          lastSync: new Date().toISOString()
+        }
+      });
+    }
+    
+    return response;
+  } catch (error) {
+    console.error('❌ Error connecting practice management:', error);
+    throw error;
+  }
+}
+
+// Disconnect practice management
+async function disconnectPracticeManagement(): Promise<any> {
+  try {
+    console.log('🔗 Disconnecting practice management');
+    
+    const settings = await storageManager.getUserSettings();
+    
+    if (settings.practiceManagement && apiClient.isAuthenticated()) {
+      await apiClient.disconnectPracticeManagement(settings.practiceManagement.platform);
+    }
+    
+    await storageManager.updateUserSettings({
+      practiceManagement: undefined
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error disconnecting practice management:', error);
+    throw error;
+  }
+}
+
+// Export all data
+async function exportAllData(): Promise<any> {
+  try {
+    console.log('📦 Exporting all data');
+    
+    const exportData = await storageManager.exportData();
+    
+    return exportData;
+  } catch (error) {
+    console.error('❌ Error exporting data:', error);
+    throw error;
+  }
+}
+
+// Get storage usage
+async function getStorageUsage(): Promise<any> {
+  try {
+    const usage = await storageManager.getStorageUsage();
+    return usage;
+  } catch (error) {
+    console.error('❌ Error getting storage usage:', error);
+    throw error;
+  }
+}
+
+// Clear all data
+async function clearAllData(): Promise<any> {
+  try {
+    console.log('🗑️ Clearing all data');
+    
+    await storageManager.clearAllData();
+    
+    // Reset API client
+    apiClient.setAuthToken('');
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error clearing data:', error);
     throw error;
   }
 }
