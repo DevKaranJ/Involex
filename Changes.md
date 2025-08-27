@@ -5,13 +5,52 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
-- Development preparation for Phase 5 (User Interface & Experience)
+- Development preparation for Phase 6 (Settings & Configuration)
 
 ### Changed
-- Development plan updated to reflect completed Phase 4 (Practice Management Integration)
+- Development plan updated to reflect completed Phase 5 (User Interface & Experience)
 
 ### Fixed
-- Minor documentation and changelog organization improvements
+- Widget width optimization preventing full-screen stretching across email interfaces
+
+---
+
+## [0.5.0] - 2025-08-27
+
+### Added
+- **Phase 5 Complete**: User Interface & Experience with comprehensive React-based components
+- React-based extension popup with TypeScript and complete billing management interface
+- Pending billable entries list with AI analysis display and real-time status updates
+- Quick action buttons for approve/reject/sync operations with loading states
+- Time and amount adjustment controls with validation and inline editing capabilities
+- Real-time statistics dashboard showing today/weekly/monthly billing summaries
+- Sync status indicators and management with practice management platform integration
+- Error handling system with user-friendly notifications and retry mechanisms
+- Responsive popup design optimized for 380x500px Chrome extension window
+- Comprehensive extension options page with tabbed interface and professional design
+- Billing rate configuration with real-time validation and currency formatting
+- AI analysis settings with dependency handling and confidence threshold controls
+- Notification preferences with cascading controls and granular customization
+- Practice management integration supporting Cleo, Practice Panther, and MyCase platforms
+- Data export/import functionality with JSON format and comprehensive metadata
+- Storage usage monitoring with statistics, cleanup tools, and backup capabilities
+- Advanced settings for debug mode, performance tuning, and power user features
+- Professional UI with consistent branding and responsive design across all components
+- Integration with Phase 4 backend sync APIs for real-time data synchronization
+
+### Changed
+- Widget width constraints optimized to prevent full-width stretching (max-width: 450px)
+- Gmail and Outlook widgets now center horizontally with improved visual balance
+- Responsive design maintains full-width behavior on mobile devices (768px breakpoint)
+- Extension popup interface enhanced with real-time sync capabilities
+- Options page upgraded with comprehensive settings management and data controls
+- All UI components synchronized for consistent user experience across platforms
+
+### Fixed
+- Widget layout issues causing excessive width consumption in email interfaces
+- Loading state management and error handling across all async operations
+- Settings synchronization ensuring real-time updates across extension components
+- Memory optimization preventing widget duplication and orphaned DOM elements
 
 ---
 
