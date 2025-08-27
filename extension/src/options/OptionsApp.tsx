@@ -17,9 +17,14 @@ import {
   Key,
   Database,
   Activity,
-  HelpCircle
+  HelpCircle,
+  Lock,
+  Eye,
+  FileText,
+  Clock
 } from 'lucide-react';
 import { UserSettings, DEFAULT_USER_SETTINGS } from '../shared/types';
+import { SecurityManager, PrivacyManager } from '../shared/security';
 
 interface ConnectedPlatform {
   platform: string;
@@ -29,7 +34,7 @@ interface ConnectedPlatform {
 }
 
 interface OptionsState {
-  activeTab: 'billing' | 'ai' | 'notifications' | 'integration' | 'data' | 'advanced';
+  activeTab: 'billing' | 'ai' | 'notifications' | 'integration' | 'data' | 'security' | 'advanced';
   loading: boolean;
   saving: boolean;
   saved: boolean;
@@ -40,6 +45,12 @@ interface OptionsState {
     syncedEntries: number;
     storageUsed: string;
     lastBackup?: string;
+  };
+  security: {
+    encryptionEnabled: boolean;
+    auditLogsCount: number;
+    lastSecurityCheck?: string;
+    privilegedEntries: number;
   };
 }
 
@@ -56,6 +67,11 @@ const OptionsApp: React.FC = () => {
       totalEntries: 0,
       syncedEntries: 0,
       storageUsed: '0 KB'
+    },
+    security: {
+      encryptionEnabled: false,
+      auditLogsCount: 0,
+      privilegedEntries: 0
     }
   });
 
@@ -103,9 +119,10 @@ const OptionsApp: React.FC = () => {
 
   const loadStats = async () => {
     try {
-      const [entriesResponse, storageResponse] = await Promise.all([
+      const [entriesResponse, storageResponse, securityResponse] = await Promise.all([
         chrome.runtime.sendMessage({ type: 'GET_BILLING_ENTRIES' }),
-        chrome.runtime.sendMessage({ type: 'GET_STORAGE_USAGE' })
+        chrome.runtime.sendMessage({ type: 'GET_STORAGE_USAGE' }),
+        chrome.runtime.sendMessage({ type: 'GET_SECURITY_STATUS' })
       ]);
 
       const stats = {
@@ -116,7 +133,15 @@ const OptionsApp: React.FC = () => {
           `${Math.round(storageResponse.data.local.used / 1024)}KB` : '0 KB'
       };
 
-      updateState({ stats });
+      const security = {
+        encryptionEnabled: securityResponse.success ? securityResponse.data.encryptionEnabled : false,
+        auditLogsCount: securityResponse.success ? securityResponse.data.auditLogsCount : 0,
+        lastSecurityCheck: securityResponse.success ? securityResponse.data.lastCheck : undefined,
+        privilegedEntries: entriesResponse.success ? 
+          entriesResponse.data.filter((e: any) => e.isPrivileged).length : 0
+      };
+
+      updateState({ stats, security });
     } catch (error) {
       console.error('Failed to load stats:', error);
     }
@@ -355,6 +380,13 @@ const OptionsApp: React.FC = () => {
           >
             <Database size={16} />
             Data
+          </button>
+          <button 
+            className={`tab-btn ${state.activeTab === 'security' ? 'active' : ''}`}
+            onClick={() => updateState({ activeTab: 'security' })}
+          >
+            <Lock size={16} />
+            Security
           </button>
           <button 
             className={`tab-btn ${state.activeTab === 'advanced' ? 'active' : ''}`}
@@ -742,6 +774,272 @@ const OptionsApp: React.FC = () => {
               <Trash2 size={16} />
               Clear All Data
             </button>
+          </div>
+        </div>
+        )}
+
+        {/* Security & Privacy Section */}
+        {state.activeTab === 'security' && (
+        <div className="settings-section">
+          <div className="section-header">
+            <Lock size={20} />
+            <h2>Security & Privacy</h2>
+          </div>
+
+          <div className="info-card">
+            <h4>
+              <Shield size={16} />
+              Data Protection & Compliance
+            </h4>
+            <p>Configure security features to protect sensitive legal data and ensure compliance with attorney-client privilege and legal industry standards.</p>
+          </div>
+
+          {/* Security Status */}
+          <div className="security-status">
+            <h3>Security Status</h3>
+            <div className="security-grid">
+              <div className="security-item">
+                <Lock size={16} />
+                <div className="security-content">
+                  <span className="security-label">Encryption</span>
+                  <span className={`security-value ${state.security.encryptionEnabled ? 'enabled' : 'disabled'}`}>
+                    {state.security.encryptionEnabled ? 'Enabled (AES-256)' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+              <div className="security-item">
+                <FileText size={16} />
+                <div className="security-content">
+                  <span className="security-label">Audit Logs</span>
+                  <span className="security-value">{state.security.auditLogsCount} entries</span>
+                </div>
+              </div>
+              <div className="security-item">
+                <Eye size={16} />
+                <div className="security-content">
+                  <span className="security-label">Privileged Communications</span>
+                  <span className="security-value">{state.security.privilegedEntries} protected</span>
+                </div>
+              </div>
+              <div className="security-item">
+                <Clock size={16} />
+                <div className="security-content">
+                  <span className="security-label">Last Security Check</span>
+                  <span className="security-value">
+                    {state.security.lastSecurityCheck ? 
+                      new Date(state.security.lastSecurityCheck).toLocaleDateString() : 
+                      'Never'
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Data Encryption */}
+          <div className="setting-group">
+            <label className="setting-label">
+              Data Encryption
+              <div className="setting-description">
+                Enable end-to-end encryption for all sensitive billing and client data stored locally.
+              </div>
+            </label>
+            <label className="setting-checkbox">
+              <input
+                type="checkbox"
+                checked={settings.security?.encryptionEnabled || false}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  security: { ...prev.security, encryptionEnabled: e.target.checked }
+                }))}
+              />
+              <span className="checkbox-text">
+                Enable data encryption (AES-256-GCM)
+                <small>Encrypts billing entries, client data, and practice management credentials</small>
+              </span>
+            </label>
+          </div>
+
+          {/* Audit Logging */}
+          <div className="setting-group">
+            <label className="setting-label">
+              Security Audit Logging
+              <div className="setting-description">
+                Maintain detailed logs of all security-relevant events for compliance and monitoring.
+              </div>
+            </label>
+            <label className="setting-checkbox">
+              <input
+                type="checkbox"
+                checked={settings.security?.auditLoggingEnabled || false}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  security: { ...prev.security, auditLoggingEnabled: e.target.checked }
+                }))}
+              />
+              <span className="checkbox-text">
+                Enable audit logging
+                <small>Log login attempts, data exports, settings changes, and security events</small>
+              </span>
+            </label>
+          </div>
+
+          {/* Attorney-Client Privilege Protection */}
+          <div className="setting-group">
+            <label className="setting-label">
+              Attorney-Client Privilege Protection
+              <div className="setting-description">
+                Automatically detect and apply enhanced protection for privileged communications.
+              </div>
+            </label>
+            <label className="setting-checkbox">
+              <input
+                type="checkbox"
+                checked={settings.security?.privilegeProtection || false}
+                onChange={(e) => setSettings(prev => ({
+                  ...prev,
+                  security: { ...prev.security, privilegeProtection: e.target.checked }
+                }))}
+              />
+              <span className="checkbox-text">
+                Enable privilege protection
+                <small>Detect privileged communications and apply enhanced security measures</small>
+              </span>
+            </label>
+          </div>
+
+          {/* Data Retention */}
+          <div className="setting-group">
+            <label className="setting-label">
+              Data Retention Policy
+              <div className="setting-description">
+                Automatically manage data retention for compliance with legal requirements.
+              </div>
+            </label>
+            <select
+              value={settings.security?.dataRetentionYears || 7}
+              onChange={(e) => setSettings(prev => ({
+                ...prev,
+                security: { ...prev.security, dataRetentionYears: parseInt(e.target.value) }
+              }))}
+              className="setting-select"
+            >
+              <option value={1}>1 Year</option>
+              <option value={3}>3 Years</option>
+              <option value={5}>5 Years</option>
+              <option value={7}>7 Years (Default)</option>
+              <option value={10}>10 Years</option>
+              <option value={-1}>Indefinite (Privileged Only)</option>
+            </select>
+          </div>
+
+          {/* Auto-logout */}
+          <div className="setting-group">
+            <label className="setting-label">
+              Automatic Session Timeout
+              <div className="setting-description">
+                Automatically lock the extension after a period of inactivity for security.
+              </div>
+            </label>
+            <select
+              value={settings.security?.autoLogoutMinutes || 60}
+              onChange={(e) => setSettings(prev => ({
+                ...prev,
+                security: { ...prev.security, autoLogoutMinutes: parseInt(e.target.value) }
+              }))}
+              className="setting-select"
+            >
+              <option value={15}>15 minutes</option>
+              <option value={30}>30 minutes</option>
+              <option value={60}>1 hour (Default)</option>
+              <option value={120}>2 hours</option>
+              <option value={480}>8 hours</option>
+              <option value={-1}>Never</option>
+            </select>
+          </div>
+
+          {/* Privacy Actions */}
+          <div className="privacy-actions">
+            <h3>Privacy & Compliance</h3>
+            <div className="action-buttons">
+              <button className="btn-primary" onClick={async () => {
+                try {
+                  const report = await PrivacyManager.generatePrivacyReport();
+                  const blob = new Blob([JSON.stringify(report, null, 2)], 
+                    { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `involex-privacy-report-${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch (error) {
+                  updateState({ error: 'Failed to generate privacy report' });
+                }
+              }}>
+                <Download size={16} />
+                Generate Privacy Report
+              </button>
+              
+              <button className="btn-primary" onClick={async () => {
+                try {
+                  const securityManager = SecurityManager.getInstance();
+                  const logs = await securityManager.getAuditLogs({ limit: 100 });
+                  const blob = new Blob([JSON.stringify(logs, null, 2)], 
+                    { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `involex-audit-logs-${new Date().toISOString().split('T')[0]}.json`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch (error) {
+                  updateState({ error: 'Failed to export audit logs' });
+                }
+              }}>
+                <FileText size={16} />
+                Export Audit Logs
+              </button>
+
+              <button className="btn-primary" onClick={async () => {
+                try {
+                  const securityManager = SecurityManager.getInstance();
+                  await securityManager.enforceDataRetention(
+                    (settings.security?.dataRetentionYears || 7) * 365
+                  );
+                  updateState({ saved: true });
+                  setTimeout(() => updateState({ saved: false }), 2000);
+                  await loadStats(); // Refresh stats
+                } catch (error) {
+                  updateState({ error: 'Failed to enforce data retention' });
+                }
+              }}>
+                <Clock size={16} />
+                Enforce Data Retention
+              </button>
+
+              <button className="btn-danger" onClick={async () => {
+                if (!confirm('Are you sure you want to permanently delete all data? This action cannot be undone and is required for GDPR compliance upon request.')) {
+                  return;
+                }
+                
+                try {
+                  const securityManager = SecurityManager.getInstance();
+                  await securityManager.clearAllSensitiveData();
+                  setSettings(DEFAULT_USER_SETTINGS);
+                  updateState({ 
+                    connectedPlatform: null,
+                    stats: { totalEntries: 0, syncedEntries: 0, storageUsed: '0 KB' },
+                    security: { encryptionEnabled: false, auditLogsCount: 0, privilegedEntries: 0 }
+                  });
+                } catch (error) {
+                  updateState({ error: 'Failed to clear data' });
+                }
+              }}>
+                <Trash2 size={16} />
+                Delete All Data (GDPR)
+              </button>
+            </div>
           </div>
         </div>
         )}

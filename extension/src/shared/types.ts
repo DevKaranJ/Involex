@@ -37,6 +37,10 @@ export interface BillingEntry {
   syncedAt?: string;
   rejectedAt?: string;
   
+  // Privacy & Security
+  isPrivileged?: boolean;
+  requiresEncryption?: boolean;
+  
   // Practice Management Integration
   practiceMgmtId?: string;
   platform?: string;
@@ -85,6 +89,16 @@ export interface UserSettings {
     theme: 'light' | 'dark' | 'auto';
     compactView: boolean;
     autoApprove: boolean;
+  };
+  
+  // Security & Privacy Settings
+  security?: {
+    encryptionEnabled: boolean;
+    auditLoggingEnabled: boolean;
+    privilegeProtection: boolean;
+    dataRetentionYears: number;
+    autoLogoutMinutes: number;
+    requireDataEncryption: boolean;
   };
   
   // Onboarding
@@ -204,6 +218,14 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     theme: 'auto',
     compactView: false,
     autoApprove: false
+  },
+  security: {
+    encryptionEnabled: true,
+    auditLoggingEnabled: true,
+    privilegeProtection: true,
+    dataRetentionYears: 7,
+    autoLogoutMinutes: 60,
+    requireDataEncryption: true
   },
   isFirstTime: true,
   onboardingCompleted: false
