@@ -230,7 +230,7 @@ const PopupApp: React.FC = () => {
     const entry = billingEntries.find(e => e.id === editingEntry.id);
     if (!entry) return;
 
-    let updates: Partial<BillingEntry> = {};
+    const updates: Partial<BillingEntry> = {};
     
     switch (editingEntry.field) {
       case 'time':
