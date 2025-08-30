@@ -36,6 +36,7 @@ export interface BillingEntry {
   approvedAt?: string;
   syncedAt?: string;
   rejectedAt?: string;
+  lastModified?: string;
   
   // Privacy & Security
   isPrivileged?: boolean;
@@ -78,7 +79,7 @@ export interface UserSettings {
   };
   
   // Practice Management Integration
-  practiceManagement?: {
+  practiceManagement: {
     platform: 'cleo' | 'practice_panther' | 'mycase';
     credentials: any;
     lastSync?: string;
@@ -92,7 +93,7 @@ export interface UserSettings {
   };
   
   // Security & Privacy Settings
-  security?: {
+  security: {
     encryptionEnabled: boolean;
     auditLoggingEnabled: boolean;
     privilegeProtection: boolean;
@@ -213,6 +214,10 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
     emailDetection: true,
     billingReminders: true,
     syncStatus: true
+  },
+  practiceManagement: {
+    platform: 'mycase',
+    credentials: {}
   },
   uiPreferences: {
     theme: 'auto',

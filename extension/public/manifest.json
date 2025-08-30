@@ -1,22 +1,26 @@
 {
   "manifest_version": 3,
-  "name": "Involex - AI Legal Billing",
+  "name": "Involex - AI Legal Billing Assistant",
   "version": "1.0.0",
-  "description": "AI-powered billing automation for lawyers. Automatically capture and log email communications as billable entries.",
+  "description": "Streamline legal billing with AI-powered email analysis. Automatically capture billable communications, track time, and sync with practice management systems.",
+  "short_name": "Involex",
   
   "permissions": [
     "storage",
     "activeTab",
-    "identity",
     "notifications",
     "scripting"
+  ],
+  
+  "optional_permissions": [
+    "identity"
   ],
   
   "host_permissions": [
     "https://mail.google.com/*",
     "https://outlook.live.com/*",
     "https://outlook.office.com/*",
-    "https://api.involex.com/*"
+    "https://outlook.office365.com/*"
   ],
   
   "background": {
@@ -44,7 +48,7 @@
   
   "action": {
     "default_popup": "popup/index.html",
-    "default_title": "Involex - AI Legal Billing",
+    "default_title": "Involex - Legal Billing Assistant",
     "default_icon": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
@@ -78,11 +82,25 @@
     }
   ],
   
-  "oauth2": {
-    "client_id": "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com",
-    "scopes": [
-      "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/gmail.readonly"
-    ]
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  
+  "homepage_url": "https://involex.com",
+  "author": "DevKaranJ",
+  
+  "commands": {
+    "analyze_email": {
+      "suggested_key": {
+        "default": "Alt+A"
+      },
+      "description": "Analyze current email for billing"
+    },
+    "open_billing": {
+      "suggested_key": {
+        "default": "Alt+B"
+      },
+      "description": "Open billing dashboard"
+    }
   }
 }

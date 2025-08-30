@@ -22,15 +22,32 @@ const PORT = process.env.PORT || 3001;
 
 // Security middleware
 app.use(helmet());
-app.use(cors({
-  origin: [
-    'chrome-extension://*',
-    'https://mail.google.com',
-    'https://outlook.live.com',
-    'https://outlook.office.com'
-  ],
-  credentials: true
-}));
+
+// CORS configuration for production
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        process.env.CORS_ORIGIN || '*',
+        'chrome-extension://*',
+        /^https:\/\/.*\.onrender\.com$/,
+        'https://mail.google.com',
+        'https://outlook.live.com',
+        'https://outlook.office.com'
+      ]
+    : [
+        'chrome-extension://*',
+        'https://mail.google.com',
+        'https://outlook.live.com',
+        'https://outlook.office.com',
+        'http://localhost:3000',
+        'http://localhost:3001'
+      ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
 
 // Rate limiting
 app.use(rateLimiter);
@@ -48,7 +65,29 @@ app.get('/health', (req, res) => {
     status: 'healthy', 
     timestamp: new Date().toISOString(),
     service: 'involex-api',
-    version: '1.0.0'
+    version: '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Involex API',
+    version: '1.0.0',
+    description: 'AI-powered legal billing backend',
+    status: 'running',
+    documentation: '/health',
+    endpoints: {
+      health: '/health',
+      auth: '/api/auth',
+      analysis: '/api/analysis',
+      billing: '/api/billing',
+      practiceManagement: '/api/practice-management',
+      sync: '/api/sync'
+    }
   });
 });
 
