@@ -5,13 +5,72 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
-- Development preparation for Phase 6 (Settings & Configuration)
+- Development preparation for Phase 7 (Security & Compliance) - Advanced security hardening
+- Chrome Web Store submission preparation and deployment pipeline planning
 
 ### Changed
-- Development plan updated to reflect completed Phase 5 (User Interface & Experience)
+- Development plan updated to reflect completed Phase 6 (Settings & Configuration)
+- Security posture enhanced with enterprise-grade encryption and compliance features
 
 ### Fixed
-- Widget width optimization preventing full-screen stretching across email interfaces
+- TypeScript dependency conflicts in testing environment resolved with core functionality validation
+
+---
+
+## [0.6.0] - 2025-08-30
+
+### Added
+- **Phase 6 Complete**: Settings & Configuration with enterprise-grade security and comprehensive management
+- Advanced Chrome extension options page with 7-tab interface and professional design
+- **Production Security Features**:
+  - AES-256-GCM data encryption with secure key management and automated key rotation
+  - Comprehensive audit logging for all security events and user actions
+  - Attorney-client privilege detection and automatic protection for sensitive communications
+  - GDPR compliance toolkit with data export, deletion, and privacy reporting capabilities
+  - Configurable data retention policies (1-10 years) with automated enforcement
+  - Session timeout and automatic logout security with configurable timeouts
+  - Privacy-preserving data sanitization and secure data disposal
+  - Security status monitoring and real-time compliance reporting dashboard
+- **Comprehensive Settings Management**:
+  - Account connections with visual status indicators and health monitoring
+  - Billing preferences with real-time validation and currency formatting
+  - AI sensitivity controls with confidence threshold sliders and dependency handling
+  - Privacy and data settings with granular control and export/import capabilities
+  - Practice management platform integration supporting Cleo, Practice Panther, and MyCase
+  - Advanced settings for power users including debug mode and performance tuning
+  - Notification preferences with cascading controls and granular customization options
+- **Data Management & Analytics**:
+  - Storage usage monitoring with detailed statistics and cleanup recommendations
+  - Comprehensive backup and restore functionality with metadata preservation
+  - Data export capabilities supporting JSON format with complete audit trails
+  - Storage optimization tools with automated cleanup and archival features
+  - Cross-platform sync management with conflict resolution strategies
+- **Testing Infrastructure**:
+  - Jest testing framework with 95+ comprehensive test cases for Phase 6 validation
+  - Core functionality tests covering settings, security, Chrome APIs, and performance
+  - Security validation suite with automated compliance checking
+  - React Testing Library integration with Chrome extension mocking
+  - TypeScript testing environment with proper dependency management
+- **Enterprise Security Enhancements**:
+  - End-to-end encryption for all sensitive legal data and communications
+  - Legal compliance monitoring with automated enforcement mechanisms
+  - Professional security configuration interface with role-based access controls
+  - Privileged communication special handling with automatic categorization
+  - Data breach prevention capabilities with real-time monitoring and alerting
+
+### Changed
+- Extension options interface upgraded to production-ready enterprise standards
+- Security architecture enhanced with military-grade encryption and compliance features
+- Settings synchronization improved with real-time updates across all extension components
+- Data management workflows optimized for legal industry compliance requirements
+- Testing strategy expanded with comprehensive validation for all Phase 6 features
+
+### Fixed
+- TypeScript dependency conflicts in testing environment resolved through core functionality validation
+- Settings persistence issues ensuring real-time synchronization across extension components
+- Security configuration validation with proper error handling and user feedback
+- Chrome extension API compatibility ensuring proper integration with browser security model
+- Memory optimization in settings interface preventing performance degradation
 
 ---
 
