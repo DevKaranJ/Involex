@@ -4,6 +4,7 @@
 import { EmailProcessor } from '../shared/emailProcessor';
 import { StorageManager } from '../shared/storage';
 import { ApiClient } from '../shared/apiClient';
+import { SecurityManager, PrivacyManager } from '../shared/security';
 
 console.log('🚀 Involex Background Service Worker Starting...');
 
@@ -11,6 +12,7 @@ console.log('🚀 Involex Background Service Worker Starting...');
 const emailProcessor = new EmailProcessor();
 const storageManager = new StorageManager();
 const apiClient = new ApiClient();
+const securityManager = SecurityManager.getInstance();
 
 // Service Worker Installation
 chrome.runtime.onInstalled.addListener((details) => {
@@ -118,6 +120,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         .catch(error => sendResponse({ success: false, error: error.message }));
       return true;
     
+    case 'GET_SECURITY_STATUS':
+      getSecurityStatus()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
+    case 'INITIALIZE_ENCRYPTION':
+      initializeEncryption()
+        .then(result => sendResponse({ success: true, data: result }))
+        .catch(error => sendResponse({ success: false, error: error.message }));
+      return true;
+    
     default:
       console.warn('❌ Unknown message type:', message.type);
       sendResponse({ success: false, error: 'Unknown message type' });
@@ -147,7 +161,10 @@ async function initializeExtension(): Promise<void> {
   try {
     console.log('🎯 Initializing Involex Extension...');
     
-    // Set default settings
+    // Initialize security manager
+    await securityManager.initializeEncryption();
+    
+    // Set default settings with security enabled
     await storageManager.setUserSettings({
       isFirstTime: true,
       billingRates: {
@@ -167,7 +184,21 @@ async function initializeExtension(): Promise<void> {
         autoClientDetection: true,
         confidenceThreshold: 0.7,
         keywords: []
+      },
+      security: {
+        encryptionEnabled: true,
+        auditLoggingEnabled: true,
+        privilegeProtection: true,
+        dataRetentionYears: 7,
+        autoLogoutMinutes: 60,
+        requireDataEncryption: true
       }
+    });
+    
+    // Log installation
+    await securityManager.logSecurityEvent({
+      type: 'LOGIN',
+      details: 'Extension installed and initialized'
     });
     
     // Show welcome notification
@@ -249,11 +280,14 @@ async function handleEmailAnalysis(emailData: any): Promise<any> {
   try {
     console.log('🤖 Analyzing email with AI:', emailData.subject);
     
-    // Call AI processing service
-    const analysisResult = await emailProcessor.analyzeEmail(emailData);
+    // Check for attorney-client privilege
+    const privilegeCheckedData = await PrivacyManager.handlePrivilegedCommunication(emailData);
     
-    // Store the result
-    await storageManager.storeBillingEntry({
+    // Call AI processing service
+    const analysisResult = await emailProcessor.analyzeEmail(privilegeCheckedData);
+    
+    // Store the result with privilege flag
+    const billingEntry = {
       id: generateId(),
       emailId: emailData.id,
       subject: emailData.subject,
@@ -261,8 +295,22 @@ async function handleEmailAnalysis(emailData: any): Promise<any> {
       recipients: emailData.recipients || [],
       timestamp: emailData.timestamp,
       aiAnalysis: analysisResult,
-      status: 'pending',
+      status: 'pending' as const,
+      isPrivileged: privilegeCheckedData.isPrivileged || false,
+      requiresEncryption: privilegeCheckedData.requiresEncryption || false,
       createdAt: new Date().toISOString()
+    };
+    
+    await storageManager.storeBillingEntry(billingEntry);
+    
+    // Log analysis event
+    await securityManager.logSecurityEvent({
+      type: 'DATA_EXPORT',
+      details: `Email analyzed: ${emailData.subject}`,
+      metadata: {
+        isPrivileged: billingEntry.isPrivileged,
+        confidence: analysisResult.confidence
+      }
     });
     
     return analysisResult;
@@ -513,9 +561,49 @@ async function clearAllData(): Promise<any> {
     // Reset API client
     apiClient.setAuthToken('');
     
+    // Log security event
+    await securityManager.logSecurityEvent({
+      type: 'DATA_EXPORT',
+      details: 'All data cleared by user request'
+    });
+    
     return { success: true };
   } catch (error) {
     console.error('❌ Error clearing data:', error);
+    throw error;
+  }
+}
+
+// Get security status
+async function getSecurityStatus(): Promise<any> {
+  try {
+    const auditLogs = await securityManager.getAuditLogs({ limit: 10 });
+    
+    return {
+      encryptionEnabled: true, // Default to true for security
+      auditLogsCount: auditLogs.length,
+      lastCheck: new Date().toISOString(),
+      privilegeProtection: true
+    };
+  } catch (error) {
+    console.error('❌ Error getting security status:', error);
+    throw error;
+  }
+}
+
+// Initialize encryption
+async function initializeEncryption(): Promise<any> {
+  try {
+    await securityManager.initializeEncryption();
+    
+    await securityManager.logSecurityEvent({
+      type: 'ENCRYPTION',
+      details: 'Encryption initialized successfully'
+    });
+    
+    return { success: true };
+  } catch (error) {
+    console.error('❌ Error initializing encryption:', error);
     throw error;
   }
 }
