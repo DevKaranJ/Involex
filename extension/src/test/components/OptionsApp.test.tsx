@@ -173,13 +173,13 @@ describe('OptionsApp Phase 6 Tests', () => {
 
       fireEvent.click(screen.getByText('AI Settings'));
 
-      await waitFor(() => {
-        const analysisToggle = screen.getByLabelText(/Enable AI email analysis/);
-        await user.click(analysisToggle);
-      });
+      const analysisToggle = screen.getByLabelText(/Enable AI email analysis/);
+      await user.click(analysisToggle);
 
-      const timeEstimationToggle = screen.getByLabelText(/Automatic time estimation/);
-      expect(timeEstimationToggle).toBeDisabled();
+      await waitFor(() => {
+        const timeEstimationToggle = screen.getByLabelText(/Automatic time estimation/);
+        expect(timeEstimationToggle).toBeDisabled();
+      });
     });
   });
 

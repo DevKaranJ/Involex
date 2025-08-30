@@ -349,4 +349,67 @@ export class StorageManager {
   private generateId(): string {
     return `involex_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
+
+  // Sync Queue Management
+  async getSyncQueue(): Promise<any[]> {
+    try {
+      const result = await chrome.storage.local.get(['syncQueue']);
+      return result.syncQueue || [];
+    } catch (error) {
+      console.error('❌ Error getting sync queue:', error);
+      return [];
+    }
+  }
+
+  async setSyncQueue(queue: any[]): Promise<void> {
+    try {
+      await chrome.storage.local.set({ syncQueue: queue });
+      console.log('✅ Sync queue updated');
+    } catch (error) {
+      console.error('❌ Error setting sync queue:', error);
+      throw error;
+    }
+  }
+
+  // Sync History Management
+  async getSyncHistory(): Promise<any[]> {
+    try {
+      const result = await chrome.storage.local.get(['syncHistory']);
+      return result.syncHistory || [];
+    } catch (error) {
+      console.error('❌ Error getting sync history:', error);
+      return [];
+    }
+  }
+
+  async setSyncHistory(history: any[]): Promise<void> {
+    try {
+      await chrome.storage.local.set({ syncHistory: history });
+      console.log('✅ Sync history updated');
+    } catch (error) {
+      console.error('❌ Error setting sync history:', error);
+      throw error;
+    }
+  }
+
+  // Analysis Cache Management
+  async getAnalysisCache(key: string): Promise<any> {
+    try {
+      const result = await chrome.storage.local.get([`analysis_${key}`]);
+      return result[`analysis_${key}`] || null;
+    } catch (error) {
+      console.error('❌ Error getting analysis cache:', error);
+      return null;
+    }
+  }
+
+  async setAnalysisCache(key: string, data: any): Promise<void> {
+    try {
+      await chrome.storage.local.set({ [`analysis_${key}`]: data });
+      console.log(`✅ Analysis cache set for key: ${key}`);
+    } catch (error) {
+      console.error('❌ Error setting analysis cache:', error);
+      throw error;
+    }
+  }
 }

@@ -200,10 +200,10 @@ export class SecurityManager {
           logs = logs.filter((log: any) => log.type === filter.type);
         }
         if (filter.startDate) {
-          logs = logs.filter((log: any) => log.timestamp >= filter.startDate);
+          logs = logs.filter((log: any) => log.timestamp >= filter.startDate!);
         }
         if (filter.endDate) {
-          logs = logs.filter((log: any) => log.timestamp <= filter.endDate);
+          logs = logs.filter((log: any) => log.timestamp <= filter.endDate!);
         }
         if (filter.limit) {
           logs = logs.slice(-filter.limit);

@@ -348,13 +348,12 @@ class BackendIntegrationService {
       
       if (response.success) {
         // Update user settings with connection status
+        const currentSettings = await this.storageManager.getUserSettings();
         await this.storageManager.updateUserSettings({
           practiceManagement: {
-            ...await this.storageManager.getUserSettings().then(s => s.practiceManagement || {}),
-            [platform]: {
-              connected: true,
-              connectedAt: new Date().toISOString()
-            }
+            platform: platform as 'cleo' | 'practice_panther' | 'mycase',
+            credentials: credentials,
+            lastSync: new Date().toISOString()
           }
         });
         
