@@ -69,8 +69,8 @@ const environments: Record<string, EnvironmentConfig> = {
   },
   
   production: {
-    apiBaseUrl: 'https://api.involex.com',
-    wsBaseUrl: 'wss://api.involex.com',
+    apiBaseUrl: 'https://involex-api.onrender.com',
+    wsBaseUrl: 'wss://involex-api.onrender.com',
     environment: 'production',
     features: {
       enableAI: true,
@@ -79,14 +79,37 @@ const environments: Record<string, EnvironmentConfig> = {
       enableDebugMode: false,
     },
     timeouts: {
-      apiRequest: 20000, // 20 seconds
-      syncOperation: 120000, // 2 minutes
-      aiAnalysis: 90000, // 90 seconds
+      apiRequest: 30000, // 30 seconds (Render free tier can be slow)
+      syncOperation: 180000, // 3 minutes (account for cold starts)
+      aiAnalysis: 120000, // 2 minutes
     },
     retryConfig: {
-      maxRetries: 5,
-      initialDelay: 2000,
+      maxRetries: 8, // More retries for free tier (cold starts)
+      initialDelay: 3000, // Longer initial delay
       backoffMultiplier: 2,
+    },
+  },
+
+  // FREE TIER DEPLOYMENT (Render.com)
+  render_free: {
+    apiBaseUrl: 'https://involex-api.onrender.com',
+    wsBaseUrl: 'wss://involex-api.onrender.com',
+    environment: 'production',
+    features: {
+      enableAI: true,
+      enableSync: true,
+      enableAnalytics: false, // Disabled to save resources
+      enableDebugMode: false,
+    },
+    timeouts: {
+      apiRequest: 45000, // 45 seconds (cold start + processing)
+      syncOperation: 300000, // 5 minutes (free tier limitations)
+      aiAnalysis: 180000, // 3 minutes (OpenAI + cold start)
+    },
+    retryConfig: {
+      maxRetries: 10, // Maximum retries for free tier reliability
+      initialDelay: 5000, // 5 second initial delay for cold starts
+      backoffMultiplier: 1.5, // Gradual backoff
     },
   },
 };
@@ -116,7 +139,7 @@ class ConfigManager {
       
       // Production extension ID pattern (will be assigned by Chrome Web Store)
       if (extensionId && extensionId.match(/^[a-z]{32}$/)) {
-        return 'production';
+        return 'render_free'; // Use free tier for production
       }
       
       // Development/unpacked extension
@@ -138,8 +161,8 @@ class ConfigManager {
       }
     }
 
-    // Default to development for safety
-    return 'development';
+    // Default to render_free for production deployment
+    return 'render_free';
   }
 
   getConfig(): EnvironmentConfig {

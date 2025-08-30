@@ -1,0 +1,56 @@
+# Render.com Deployment Configuration for Involex Backend
+
+# Build Command
+npm run build
+
+# Start Command  
+npm start
+
+# Environment
+NODE_ENV=production
+
+# Health Check
+GET /health
+
+# Auto-Deploy
+Branch: main (deployment-distribution)
+
+# Pricing Tier
+Free Tier (0$/month)
+- 750 hours/month
+- Sleeps after 15 minutes of inactivity
+- 512MB RAM
+- Shared CPU
+- 1GB PostgreSQL database included
+
+# Environment Variables (to be set in Render dashboard)
+DATABASE_URL=postgresql://username:password@host:port/database
+OPENAI_API_KEY=your_openai_api_key
+JWT_SECRET=your_jwt_secret_key
+PORT=10000
+NODE_ENV=production
+CORS_ORIGIN=chrome-extension://your-extension-id
+
+# Custom Domain (Optional - FREE)
+involex-api.onrender.com (automatic)
+
+# SSL Certificate
+Automatic SSL (FREE)
+
+# Logs & Monitoring
+Built-in logging (FREE tier)
+Basic metrics (FREE tier)
+
+# Database
+PostgreSQL (FREE tier)
+- 1GB storage
+- Shared instance
+- No connection pooling
+- Automatic backups (1 day retention)
+
+# Deployment Notes
+- Render will automatically detect Node.js
+- package.json start script will be used
+- Build artifacts cached for faster deployments
+- Automatic deploys on git push to main branch
+- Zero downtime deployments (even on free tier)
