@@ -86,7 +86,7 @@ Involex is designed as a Chrome extension with cloud backend architecture:
 - **Request Routing**: Direct requests to appropriate services
 - **Data Validation**: Ensure data integrity and security
 
-#### AI Engine (Python/Node.js)
+#### AI Engine (Node.js)
 - **Email Classification**: Determine if email contains billable work
 - **Time Estimation**: Predict billable hours based on content analysis
 - **Client/Matter Detection**: Identify relevant clients and matters
